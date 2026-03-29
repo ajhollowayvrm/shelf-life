@@ -71,10 +71,21 @@ export async function GET(request: NextRequest) {
     return Response.json({ error: "Missing barcode code parameter" }, { status: 400 });
   }
 
-  const res = await fetch(
-    `https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(code)}.json`
-  );
-  const data = await res.json();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 6000);
+
+  let data;
+  try {
+    const res = await fetch(
+      `https://world.openfoodfacts.org/api/v0/product/${encodeURIComponent(code)}.json`,
+      { signal: controller.signal }
+    );
+    data = await res.json();
+  } catch {
+    return Response.json({ found: false, barcode: code });
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (data.status === 1) {
     const product = data.product;

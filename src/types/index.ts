@@ -44,6 +44,9 @@ export const DEFAULT_UNITS = [
   "can",
   "jar",
   "pack",
+  "loaf",
+  "bunch",
+  "dozen",
 ] as const;
 
 export interface PantryItem {

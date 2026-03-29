@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { PantryItem, Category, CATEGORIES } from "@/types";
+import { PantryItem, Category, CATEGORIES, DEFAULT_UNITS } from "@/types";
 import { getStockLevel, getExpiryLabel } from "@/lib/stockLogic";
-import { getStepForUnit } from "@/lib/units";
+import { getStepForUnit, getAllUnits } from "@/lib/units";
 import { usePantryStore } from "@/store/usePantryStore";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import StockBar from "./StockBar";
@@ -18,21 +18,23 @@ export default function ItemDetailSheet({
   item,
   onClose,
 }: ItemDetailSheetProps) {
-  const { updateItem, deleteItem } = usePantryStore();
+  const { updateItem, deleteItem, customUnits } = usePantryStore();
   const [quantity, setQuantity] = useState(item.quantity);
+  const [unit, setUnit] = useState(item.unit);
   const [category, setCategory] = useState<Category>(item.category);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const allUnits = getAllUnits(customUnits);
   const { containerRef, handleKeyDown } = useFocusTrap(onClose);
   const stock = getStockLevel({ ...item, quantity });
   const expiryLabel = item.expiryDate ? getExpiryLabel(item.expiryDate) : null;
-  const hasChanges = quantity !== item.quantity || category !== item.category;
+  const hasChanges = quantity !== item.quantity || category !== item.category || unit !== item.unit;
 
   const handleSave = async () => {
     if (!hasChanges) return;
     setSaving(true);
-    await updateItem(item.id, { quantity, category });
+    await updateItem(item.id, { quantity, category, unit });
     setSaving(false);
     onClose();
   };
@@ -125,10 +127,32 @@ export default function ItemDetailSheet({
               <QuantityAdjuster
                 value={quantity}
                 onChange={setQuantity}
-                step={getStepForUnit(item.unit)}
-                unit={item.unit}
+                step={getStepForUnit(unit)}
+                unit={unit}
               />
             </div>
+          </div>
+
+          {/* Unit dropdown */}
+          <div className="mb-5">
+            <label className="text-xs font-medium text-text-secondary block mb-2">
+              Unit
+            </label>
+            <select
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+              className="w-full h-10 px-3 bg-bg-secondary border border-border rounded-[var(--radius-md)] text-sm text-text-primary focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
+            >
+              {allUnits.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
+              {/* Show current unit even if not in the list */}
+              {!allUnits.includes(unit) && (
+                <option value={unit}>{unit}</option>
+              )}
+            </select>
           </div>
 
           {/* Category dropdown */}

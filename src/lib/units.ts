@@ -13,6 +13,9 @@ export function getStepForUnit(unit: string): number {
     case "can":
     case "jar":
     case "pack":
+    case "loaf":
+    case "bunch":
+    case "dozen":
       return 1;
     case "cups":
     case "lbs":
