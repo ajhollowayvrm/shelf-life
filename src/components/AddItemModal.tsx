@@ -31,7 +31,6 @@ export default function AddItemModal({ onClose, prefill }: AddItemModalProps) {
   const [quantity, setQuantity] = useState<number>(1);
   const [maxQuantity, setMaxQuantity] = useState<number>(5);
   const [expiryDate, setExpiryDate] = useState("");
-  const [saving, setSaving] = useState(false);
 
   const allUnits = [...DEFAULT_UNITS, ...customUnits];
 
@@ -53,12 +52,12 @@ export default function AddItemModal({ onClose, prefill }: AddItemModalProps) {
     setShowCustomUnit(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
-    setSaving(true);
-    await addItem({
+    // Fire-and-forget — Firestore onSnapshot will sync the item into the list
+    addItem({
       name: name.trim(),
       category,
       emoji,
@@ -73,7 +72,6 @@ export default function AddItemModal({ onClose, prefill }: AddItemModalProps) {
       autoAddToShoppingList: true,
       lastUsed: new Date(),
     });
-    setSaving(false);
     onClose();
   };
 
@@ -234,10 +232,10 @@ export default function AddItemModal({ onClose, prefill }: AddItemModalProps) {
           {/* Submit */}
           <button
             type="submit"
-            disabled={!name.trim() || saving}
+            disabled={!name.trim()}
             className="w-full h-11 bg-primary text-white text-sm font-semibold rounded-[var(--radius-md)] hover:bg-primary-light active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {saving ? "Adding..." : "Add to Pantry"}
+            Add to Pantry
           </button>
         </form>
 

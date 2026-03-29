@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import StoreProvider from "@/components/StoreProvider";
+import UpdateBanner from "@/components/UpdateBanner";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -36,6 +37,7 @@ export default function RootLayout({
     <html lang="en" className={`${dmSans.variable} h-full`}>
       <body className="h-full antialiased">
         <div className="app-container flex flex-col">
+          <UpdateBanner />
           <StoreProvider>
             {children}
           </StoreProvider>

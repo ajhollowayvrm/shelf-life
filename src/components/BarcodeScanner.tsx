@@ -79,6 +79,21 @@ export default function BarcodeScanner({
     }
   }, [onScan, onError]);
 
+  const pauseScanner = useCallback(async () => {
+    if (scannerRef.current?.isScanning) {
+      await scannerRef.current.pause(true);
+    }
+  }, []);
+
+  const resumeScanner = useCallback(async () => {
+    if (scannerRef.current?.getState() === 3) {
+      // State 3 = PAUSED in html5-qrcode
+      scannerRef.current.resume();
+    } else if (!scannerRef.current?.isScanning) {
+      await startScanner();
+    }
+  }, [startScanner]);
+
   const stopScanner = useCallback(async () => {
     if (scannerRef.current?.isScanning) {
       await scannerRef.current.stop();
@@ -88,15 +103,15 @@ export default function BarcodeScanner({
 
   useEffect(() => {
     if (active) {
-      startScanner();
+      resumeScanner();
     } else {
-      stopScanner();
+      pauseScanner();
     }
 
     return () => {
       stopScanner();
     };
-  }, [active, startScanner, stopScanner]);
+  }, [active, resumeScanner, pauseScanner, stopScanner]);
 
   return (
     <div className="relative w-full" ref={containerRef}>
@@ -108,7 +123,7 @@ export default function BarcodeScanner({
       {/* Scan region overlay — wide rectangle for barcodes */}
       {active && hasPermission && (
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-          <div className="relative w-[85%] max-w-[350px] h-[80px]">
+          <div className="relative w-[95%] h-[70%]">
             {/* Corner brackets */}
             <span className="absolute top-0 left-0 w-6 h-4 border-t-2 border-l-2 border-accent rounded-tl" />
             <span className="absolute top-0 right-0 w-6 h-4 border-t-2 border-r-2 border-accent rounded-tr" />
