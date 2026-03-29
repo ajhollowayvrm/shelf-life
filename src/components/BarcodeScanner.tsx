@@ -37,6 +37,7 @@ export default function BarcodeScanner({
     try {
       const scanner = new Html5Qrcode(elementId, {
         formatsToSupport: BARCODE_FORMATS,
+        useBarCodeDetectorIfSupported: true,
         verbose: false,
       });
       scannerRef.current = scanner;
@@ -44,15 +45,17 @@ export default function BarcodeScanner({
       await scanner.start(
         { facingMode: "environment" },
         {
-          fps: 10,
-          qrbox: (viewfinderWidth, viewfinderHeight) => ({
-            width: Math.min(viewfinderWidth * 0.8, 300),
-            height: Math.min(viewfinderHeight * 0.3, 100),
-          }),
-          aspectRatio: 1,
+          fps: 5,
+          qrbox: (viewfinderWidth, viewfinderHeight) => {
+            // Wide rectangle for barcodes — 80% width, ~25% height
+            const width = Math.min(Math.floor(viewfinderWidth * 0.85), 350);
+            const height = Math.min(Math.floor(viewfinderHeight * 0.25), 120);
+            return { width, height };
+          },
+          aspectRatio: 4 / 3,
+          disableFlip: true,
         },
         (decodedText) => {
-          // Debounce: ignore same code within 3 seconds
           const now = Date.now();
           if (
             decodedText === lastScanRef.current &&
@@ -63,9 +66,7 @@ export default function BarcodeScanner({
           lastScanRef.current = decodedText;
           lastScanTimeRef.current = now;
 
-          // Haptic feedback
           if (navigator.vibrate) navigator.vibrate(100);
-
           onScan(decodedText);
         },
         undefined
@@ -104,17 +105,17 @@ export default function BarcodeScanner({
         className="w-full rounded-[var(--radius-lg)] overflow-hidden bg-black"
       />
 
-      {/* Scan line animation overlay */}
+      {/* Scan region overlay — wide rectangle for barcodes */}
       {active && hasPermission && (
         <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-          <div className="relative w-[80%] max-w-[300px] h-[100px]">
+          <div className="relative w-[85%] max-w-[350px] h-[80px]">
             {/* Corner brackets */}
-            <span className="absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 border-accent rounded-tl" />
-            <span className="absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 border-accent rounded-tr" />
-            <span className="absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 border-accent rounded-bl" />
-            <span className="absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 border-accent rounded-br" />
+            <span className="absolute top-0 left-0 w-6 h-4 border-t-2 border-l-2 border-accent rounded-tl" />
+            <span className="absolute top-0 right-0 w-6 h-4 border-t-2 border-r-2 border-accent rounded-tr" />
+            <span className="absolute bottom-0 left-0 w-6 h-4 border-b-2 border-l-2 border-accent rounded-bl" />
+            <span className="absolute bottom-0 right-0 w-6 h-4 border-b-2 border-r-2 border-accent rounded-br" />
             {/* Scan line */}
-            <div className="absolute left-2 right-2 h-0.5 bg-accent/70 animate-scan-line" />
+            <div className="absolute left-3 right-3 h-0.5 bg-accent/70 animate-scan-line" />
           </div>
         </div>
       )}
