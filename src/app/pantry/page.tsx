@@ -116,7 +116,7 @@ export default function PantryPage() {
       </div>
 
       {/* Category filters */}
-      <div className="pb-3">
+      <div className="px-4 pb-3">
         <CategoryPicker selected={category} onSelect={setCategory} />
       </div>
 

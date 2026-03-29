@@ -42,6 +42,10 @@ function toDate(val: Timestamp | Date | undefined): Date | undefined {
 function toFirestoreItem(item: Partial<PantryItem>) {
   const data: Record<string, unknown> = { ...item };
   delete data.id;
+  // Remove undefined values — Firestore rejects them
+  for (const key of Object.keys(data)) {
+    if (data[key] === undefined) delete data[key];
+  }
   if (item.expiryDate) data.expiryDate = Timestamp.fromDate(item.expiryDate);
   if (item.lastUsed) data.lastUsed = Timestamp.fromDate(item.lastUsed);
   if (item.createdAt) data.createdAt = Timestamp.fromDate(item.createdAt);

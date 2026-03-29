@@ -28,6 +28,7 @@ export default function ScanPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   const handleScan = useCallback(async (code: string) => {
+    if (scanState !== "scanning") return;
     Sentry.addBreadcrumb({ category: "scan", message: `Barcode detected: ${code}`, level: "info" });
     setScanState("loading");
 
@@ -47,7 +48,7 @@ export default function ScanPage() {
       setScanState("error");
       setToast("Failed to look up barcode. Check your connection.");
     }
-  }, []);
+  }, [scanState]);
 
   const handleAddFromProduct = () => {
     if (product?.found) {
