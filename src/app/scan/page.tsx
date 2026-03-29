@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import * as Sentry from "@sentry/nextjs";
 import BarcodeScanner from "@/components/BarcodeScanner";
 import AddItemModal from "@/components/AddItemModal";
 import Toast from "@/components/Toast";
@@ -27,11 +28,13 @@ export default function ScanPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   const handleScan = useCallback(async (code: string) => {
+    Sentry.addBreadcrumb({ category: "scan", message: `Barcode detected: ${code}`, level: "info" });
     setScanState("loading");
 
     try {
       const result = await lookupBarcode(code);
       setProduct(result);
+      Sentry.addBreadcrumb({ category: "scan", message: `Lookup result: ${result.found ? result.name : "not found"}`, level: "info" });
 
       if (result.found) {
         setScanState("found");
@@ -39,7 +42,8 @@ export default function ScanPage() {
         setScanState("not-found");
         setPrefill({ barcode: code });
       }
-    } catch {
+    } catch (err) {
+      Sentry.captureException(err, { extra: { barcode: code } });
       setScanState("error");
       setToast("Failed to look up barcode. Check your connection.");
     }
