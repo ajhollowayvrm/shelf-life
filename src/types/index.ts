@@ -1,0 +1,115 @@
+export type Category =
+  | "Produce"
+  | "Dairy"
+  | "Proteins"
+  | "Grains"
+  | "Baking"
+  | "Oils & Vinegars"
+  | "Condiments"
+  | "Canned"
+  | "Spices"
+  | "Frozen"
+  | "Beverages"
+  | "Snacks"
+  | "Household"
+  | "Other";
+
+export const CATEGORIES: Category[] = [
+  "Produce",
+  "Dairy",
+  "Proteins",
+  "Grains",
+  "Baking",
+  "Oils & Vinegars",
+  "Condiments",
+  "Canned",
+  "Spices",
+  "Frozen",
+  "Beverages",
+  "Snacks",
+  "Household",
+  "Other",
+];
+
+export const DEFAULT_UNITS = [
+  "pieces",
+  "cups",
+  "lbs",
+  "oz",
+  "gallons",
+  "liters",
+  "bottle",
+  "bag",
+  "box",
+  "can",
+  "jar",
+  "pack",
+] as const;
+
+export interface PantryItem {
+  id: string;
+  name: string;
+  category: Category;
+  emoji: string;
+  quantity: number;
+  maxQuantity: number;
+  unit: string;
+  customUnit?: string;
+  barcode?: string;
+  brand?: string;
+  expiryDate?: Date;
+  lowStockThreshold: number;
+  autoAddToShoppingList: boolean;
+  lastUsed: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ShoppingListItem {
+  id: string;
+  name: string;
+  source: "auto" | "manual";
+  pantryItemId?: string;
+  checked: boolean;
+  quantity?: number;
+  unit?: string;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type StockLevel = "critical" | "low" | "medium" | "good";
+
+export interface StockInfo {
+  level: StockLevel;
+  percentage: number;
+  color: string;
+  label: string;
+}
+
+export interface UserSettings {
+  defaultCategories: Category[];
+  customUnits: string[];
+  lowStockNotifications: boolean;
+  expiryNotifications: boolean;
+  notificationTime: string;
+  theme: "light" | "dark" | "system";
+}
+
+export interface ProductLookupResult {
+  found: boolean;
+  name: string;
+  brand?: string;
+  category?: Category;
+  size?: string;
+  imageUrl?: string;
+  barcode: string;
+}
+
+export interface ClaudeVisionResult {
+  name: string;
+  brand?: string;
+  category: Category;
+  suggestedUnit: string;
+  emoji: string;
+}
