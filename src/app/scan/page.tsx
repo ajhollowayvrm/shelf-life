@@ -16,6 +16,7 @@ interface Prefill {
   unit?: string;
   brand?: string;
   barcode?: string;
+  imageUrl?: string;
 }
 
 export default function ScanPage() {
@@ -52,6 +53,7 @@ export default function ScanPage() {
         category: product.category ?? "Other",
         barcode: product.barcode,
         emoji: "📦",
+        imageUrl: product.imageUrl ?? undefined,
       });
     }
     setShowAddModal(true);
@@ -140,12 +142,20 @@ export default function ScanPage() {
                 )}
               </div>
             </div>
-            <button
-              onClick={handleAddFromProduct}
-              className="w-full h-10 bg-primary text-white text-sm font-semibold rounded-[var(--radius-md)] hover:bg-primary-light active:scale-[0.98] transition-all"
-            >
-              Add to Pantry
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={resetScanner}
+                className="flex-1 h-10 text-sm font-medium text-text-secondary border border-border rounded-[var(--radius-md)] hover:bg-bg-tertiary transition-colors"
+              >
+                Scan Again
+              </button>
+              <button
+                onClick={handleAddFromProduct}
+                className="flex-1 h-10 bg-primary text-white text-sm font-semibold rounded-[var(--radius-md)] hover:bg-primary-light active:scale-[0.98] transition-all"
+              >
+                Add to Pantry
+              </button>
+            </div>
           </div>
         )}
 

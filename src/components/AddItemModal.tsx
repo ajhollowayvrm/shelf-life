@@ -14,6 +14,7 @@ interface AddItemModalProps {
     unit?: string;
     brand?: string;
     barcode?: string;
+    imageUrl?: string;
   };
 }
 
@@ -66,6 +67,7 @@ export default function AddItemModal({ onClose, prefill }: AddItemModalProps) {
       unit,
       barcode: prefill?.barcode,
       brand: prefill?.brand,
+      imageUrl: prefill?.imageUrl,
       expiryDate: expiryDate ? new Date(expiryDate) : undefined,
       lowStockThreshold: 0.25,
       autoAddToShoppingList: true,

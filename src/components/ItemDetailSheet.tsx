@@ -69,7 +69,15 @@ export default function ItemDetailSheet({
         <div className="px-5 pb-6">
           {/* Header */}
           <div className="flex items-start gap-3 mb-4">
-            <span className="text-4xl">{item.emoji}</span>
+            {item.imageUrl ? (
+              <img
+                src={item.imageUrl}
+                alt={item.name}
+                className="w-12 h-12 rounded-[var(--radius-md)] object-cover bg-bg-tertiary shrink-0"
+              />
+            ) : (
+              <span className="text-4xl">{item.emoji}</span>
+            )}
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-bold text-text-primary truncate">
                 {item.name}

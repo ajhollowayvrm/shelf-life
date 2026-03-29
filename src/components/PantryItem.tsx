@@ -28,8 +28,16 @@ export default function PantryItemRow({ item, onClick, index = 0 }: PantryItemPr
       className="w-full flex items-center gap-3 px-3 py-3 rounded-[var(--radius-md)] hover:bg-bg-secondary active:bg-bg-tertiary transition-colors text-left animate-list-item"
       style={{ animationDelay: `${Math.min(index * 40, 400)}ms` }}
     >
-      {/* Emoji */}
-      <span className="text-2xl w-9 text-center shrink-0">{item.emoji}</span>
+      {/* Item image or emoji fallback */}
+      {item.imageUrl ? (
+        <img
+          src={item.imageUrl}
+          alt={item.name}
+          className="w-9 h-9 rounded-[var(--radius-sm)] object-cover bg-bg-tertiary shrink-0"
+        />
+      ) : (
+        <span className="text-2xl w-9 text-center shrink-0">{item.emoji}</span>
+      )}
 
       {/* Name + stock bar */}
       <div className="flex-1 min-w-0">

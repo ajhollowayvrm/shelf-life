@@ -57,6 +57,7 @@ export interface PantryItem {
   customUnit?: string;
   barcode?: string;
   brand?: string;
+  imageUrl?: string;
   expiryDate?: Date;
   lowStockThreshold: number;
   autoAddToShoppingList: boolean;

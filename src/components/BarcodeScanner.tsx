@@ -45,11 +45,11 @@ export default function BarcodeScanner({
       await scanner.start(
         { facingMode: "environment" },
         {
-          fps: 5,
+          fps: 10,
           qrbox: (viewfinderWidth, viewfinderHeight) => {
-            // Wide rectangle for barcodes — 80% width, ~25% height
-            const width = Math.min(Math.floor(viewfinderWidth * 0.85), 350);
-            const height = Math.min(Math.floor(viewfinderHeight * 0.25), 120);
+            // Scan nearly the full viewfinder — barcode can be anywhere
+            const width = Math.floor(viewfinderWidth * 0.95);
+            const height = Math.floor(viewfinderHeight * 0.7);
             return { width, height };
           },
           aspectRatio: 4 / 3,
