@@ -9,7 +9,8 @@ import {
 } from "@/lib/fcm";
 
 export default function NotificationBanner() {
-  const userId = usePantryStore((s) => s.userId);
+  const user = usePantryStore((s) => s.user);
+  const userId = user?.uid;
   const [visible, setVisible] = useState(false);
   const [requesting, setRequesting] = useState(false);
 

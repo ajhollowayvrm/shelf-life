@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import StoreProvider from "@/components/StoreProvider";
-import BottomNav from "@/components/BottomNav";
-import OfflineIndicator from "@/components/OfflineIndicator";
-import InstallPrompt from "@/components/InstallPrompt";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -38,14 +35,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} h-full`}>
       <body className="h-full antialiased">
-        <StoreProvider>
-          <div className="app-container flex flex-col">
-            <OfflineIndicator />
-            <InstallPrompt />
+        <div className="app-container flex flex-col">
+          <StoreProvider>
             {children}
-            <BottomNav />
-          </div>
-        </StoreProvider>
+          </StoreProvider>
+        </div>
       </body>
     </html>
   );

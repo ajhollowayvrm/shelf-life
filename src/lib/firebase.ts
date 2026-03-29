@@ -1,6 +1,14 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore, enableIndexedDbPersistence, type Firestore } from "firebase/firestore";
-import { getAuth, signInAnonymously, onAuthStateChanged, type Auth } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signOut as firebaseSignOut,
+  type Auth,
+  type User,
+} from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,6 +24,8 @@ let _db: Firestore | null = null;
 let _auth: Auth | null = null;
 let _persistenceEnabled = false;
 
+const googleProvider = new GoogleAuthProvider();
+
 export function getFirebaseApp(): FirebaseApp {
   if (!_app) {
     _app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
@@ -28,9 +38,7 @@ export function getDb(): Firestore {
     _db = getFirestore(getFirebaseApp());
     if (typeof window !== "undefined" && !_persistenceEnabled) {
       _persistenceEnabled = true;
-      enableIndexedDbPersistence(_db).catch(() => {
-        // Multi-tab or browser doesn't support — that's fine
-      });
+      enableIndexedDbPersistence(_db).catch(() => {});
     }
   }
   return _db;
@@ -43,19 +51,32 @@ export function getFirebaseAuth(): Auth {
   return _auth;
 }
 
-// Auto sign-in anonymously
-export function ensureAuth(): Promise<string> {
-  return new Promise((resolve, reject) => {
+// Wait for existing auth state (returns user if already signed in, null if not)
+export function waitForAuth(): Promise<User | null> {
+  return new Promise((resolve) => {
     const auth = getFirebaseAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       unsubscribe();
-      if (user) {
-        resolve(user.uid);
-      } else {
-        signInAnonymously(auth)
-          .then((cred) => resolve(cred.user.uid))
-          .catch(reject);
-      }
+      resolve(user);
     });
   });
+}
+
+// Sign in with Google
+export async function signInWithGoogle(): Promise<User> {
+  const auth = getFirebaseAuth();
+  const result = await signInWithPopup(auth, googleProvider);
+  return result.user;
+}
+
+// Sign out
+export async function signOut(): Promise<void> {
+  const auth = getFirebaseAuth();
+  await firebaseSignOut(auth);
+}
+
+// Subscribe to auth state changes
+export function onAuthChange(callback: (user: User | null) => void) {
+  const auth = getFirebaseAuth();
+  return onAuthStateChanged(auth, callback);
 }

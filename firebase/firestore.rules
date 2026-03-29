@@ -1,8 +1,33 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
+
+    // User profiles — users can only read/write their own
+    match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Households — only members can access
+    match /households/{householdId} {
+      allow read: if request.auth != null && isMember(householdId);
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && isMember(householdId);
+
+      // Pantry items and shopping list — only household members
+      match /{subcollection}/{docId} {
+        allow read, write: if request.auth != null && isMember(householdId);
+      }
+    }
+
+    // Allow querying households by invite code (for joining)
+    match /households/{householdId} {
+      allow list: if request.auth != null
+        && request.query.limit <= 1
+        && resource.data.inviteCode == resource.data.inviteCode;
+    }
+
+    function isMember(householdId) {
+      return request.auth.uid in get(/databases/$(database)/documents/households/$(householdId)).data.members;
     }
   }
 }

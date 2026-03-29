@@ -87,6 +87,30 @@ export interface StockInfo {
   label: string;
 }
 
+export interface Household {
+  id: string;
+  name: string;
+  inviteCode: string;
+  createdBy: string;
+  members: Record<string, HouseholdMember>;
+  createdAt: Date;
+}
+
+export interface HouseholdMember {
+  displayName: string;
+  email: string;
+  photoURL?: string;
+  joinedAt: Date;
+}
+
+export interface UserProfile {
+  uid: string;
+  displayName: string;
+  email: string;
+  photoURL?: string;
+  householdId?: string;
+}
+
 export interface UserSettings {
   defaultCategories: Category[];
   customUnits: string[];

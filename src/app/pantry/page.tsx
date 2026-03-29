@@ -16,8 +16,9 @@ import Toast from "@/components/Toast";
 const STOCK_SORT_ORDER = { critical: 0, low: 1, medium: 2, good: 3 };
 
 export default function PantryPage() {
-  const { pantryItems, isLoading } = usePantryStore();
+  const { pantryItems, isLoading, household, signOut } = usePantryStore();
   const [search, setSearch] = useState("");
+  const [showHousehold, setShowHousehold] = useState(false);
   const [category, setCategory] = useState<Category | "All">("All");
   const [selectedItem, setSelectedItem] = useState<PantryItem | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -55,7 +56,17 @@ export default function PantryPage() {
     <main className="flex-1 flex flex-col pb-24">
       {/* Header */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-text-primary">Pantry</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Pantry</h1>
+          {household && (
+            <button
+              onClick={() => setShowHousehold(!showHousehold)}
+              className="text-[11px] text-text-tertiary hover:text-text-secondary"
+            >
+              {household.name}
+            </button>
+          )}
+        </div>
         <button
           onClick={() => setShowAddModal(true)}
           className="w-9 h-9 flex items-center justify-center bg-primary text-white rounded-full text-lg font-bold hover:bg-primary-light transition-colors"
@@ -64,6 +75,37 @@ export default function PantryPage() {
           +
         </button>
       </div>
+
+      {/* Household info panel */}
+      {showHousehold && household && (
+        <div className="mx-4 mb-3 bg-bg-secondary rounded-[var(--radius-lg)] p-4 animate-fade-in">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-text-primary">{household.name}</span>
+            <span className="text-[10px] text-text-muted">
+              {Object.keys(household.members).length} member{Object.keys(household.members).length !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xs text-text-secondary">Invite code:</span>
+            <code className="text-xs font-mono font-bold text-accent tracking-wider bg-accent/10 px-2 py-0.5 rounded">
+              {household.inviteCode}
+            </code>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {Object.values(household.members).map((m, i) => (
+              <span key={i} className="text-xs text-text-secondary bg-bg-tertiary px-2 py-1 rounded-[var(--radius-pill)]">
+                {m.displayName}
+              </span>
+            ))}
+          </div>
+          <button
+            onClick={signOut}
+            className="text-xs text-stock-critical hover:underline"
+          >
+            Sign out
+          </button>
+        </div>
+      )}
 
       {/* Notification permission banner */}
       <NotificationBanner />
